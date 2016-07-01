@@ -35,6 +35,7 @@
 			brain[c].INS = 0;
 			brain[c].synaps = [];
 			brain[c].SYNAPSES = 0;
+			brain[c].set = 0;
 		}
 
 		function init() { // clears your brain and your memory ;)
@@ -66,37 +67,44 @@
 
 			for(c = 0; c < INPUTS; c++) {
 				brain[c + OUTPUTS].data = input[c];
+				brain[c + OUTPUTS].set = 1;
 			}
 
 			//debugger;
 
 			for(j = 0; isig && j < MAX_ITER; j++) {
 				isig = 0;
-				for(c = OUTPUTS; c < brain_size; c++) {
-					if(!brain[c].noins && brain[c].INS < 1) {
-						continue;
-					}
-					sum = 0;
-					for(i = 0; i < brain[c].INS; i++) {
-						sum += brain[c].in[i];
-					}
-					brain[c].data = sum / brain[c].INS;
 
-					brain[c].INS = 0;
-					brain[c].in = [];
+				for(c = 0; c < brain_size; c++) {
 
-					for(i = 0; i < brain[c].SYNAPSES; i++) {
-						debugger;
-						document.write(c + " > " + brain[c].synaps[i].cell + " (" + brain[c].data + ") = " + brain[c].data + "<br />");
-						// another brain cell in gets data from current cell
-						brain[brain[c].synaps[i].cell].in[brain[brain[c].synaps[i].cell].INS++] = brain[c].data;
+					if(brain[c].INS > 0) {
+						sum = 0;
+						for(i = 0; i < brain[c].INS; i++) {
+							sum += brain[c].in[i];
+						}
+						brain[c].data = sum / brain[c].INS;
+
+						brain[c].INS = 0;
+						brain[c].in = [];
+						brain[c].set = 1;
+					}
+
+					if(brain[c].set) {
+						for(i = 0; i < brain[c].SYNAPSES; i++) {
+							// another brain cell in gets data from current cell
+							brain[brain[c].synaps[i].cell].in[brain[brain[c].synaps[i].cell].INS] = brain[c].data;
+							brain[brain[c].synaps[i].cell].set = 1;
+							brain[brain[c].synaps[i].cell].INS++;
+							//document.write(c + " > " + brain[c].synaps[i].cell + " (" + brain[c].data + ") = " + brain[brain[c].synaps[i].cell].data + "<br />");
+						}
+						brain[c].set = 0;
 						isig = 1;
 					}
 				}
 			}
 
 			if(isig) {
-				//alert("return on MAX_ITER");
+				document.write("return on MAX_ITER<br />");
 			}
 
 			for(c = 0; c < OUTPUTS; c++) {
@@ -167,7 +175,7 @@
 
 			init();
 
-			for(i = 0; i < 10000; i++) {
+			for(i = 0; i < 1000; i++) {
 				num = Math.floor(Math.random() * (1000000));
 				j = num;
 				for(c = 0; c < INPUTS; c++) {
