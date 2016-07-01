@@ -16,7 +16,7 @@
 
 		var MAX_RATE = 100;
 
-		var RANDOMIZATION_SPEED = 1; // high values caused unstability
+		var RANDOMIZATION = 1; // high values caused unstability
 		// end config
 
 		var input = [];
@@ -32,15 +32,28 @@
 				input[c].SYNAPSES = 0;
 				input[c].data = 0;
 			}
-			for(c = 0; c < OUTPUTS; c++) {
-				output[c] = {};
-			}
-			brain_size = 0;
+
+			brain_size = OUTPUTS;
 			brain = [];
+
+			for(c = 0; c < OUTPUTS; c++) {
+				output[c] = 0;
+				brain[c] = {};
+				brain[c].data = 0;
+				brain[c].static = 1;
+				brain[c].synaps = [];
+				brain[c].SYNAPSES = 0;
+			}
 		}
 
 		function run() { // gets input[] preconfigured and returns (configures) output[]
-
+			var c;
+			var i;
+			for(c = 0; c < INPUTS; c++) {
+				for(i = 0; i < input[c].SYNAPSES; i++) {
+					nsignal(brain[input[c].synaps[i]], input[c].data);
+				}
+			}
 		}
 
 		alert(input[23]);
