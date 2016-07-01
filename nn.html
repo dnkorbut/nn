@@ -41,6 +41,10 @@
 				brain[c] = {};
 				brain[c].data = 0;
 				brain[c].static = 1;
+				brain[c].in = [];
+				brain[c].INS = 0;
+
+				// only real brain related, not output sector. Just for note
 				brain[c].synaps = [];
 				brain[c].SYNAPSES = 0;
 			}
@@ -51,7 +55,8 @@
 			var i;
 			for(c = 0; c < INPUTS; c++) {
 				for(i = 0; i < input[c].SYNAPSES; i++) {
-					nsignal(brain[input[c].synaps[i]], input[c].data);
+					// brain cell input gets data from input cell
+					brain[input[c].synaps[i].cell].in[input[c].synaps[i].in] = input[c].data;
 				}
 			}
 		}
