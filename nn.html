@@ -11,8 +11,8 @@
 	<script>
 
 		// config
-		var INPUTS = 32 * 32;
-		var OUTPUTS = 11;
+		var INPUTS = 6;
+		var OUTPUTS = 1;
 
 		var MAX_RATE = 100;
 		var MAX_ITER = 100;
@@ -134,31 +134,97 @@
 			}
 
 			for(i = 0; i < err; i++) {
-				c = Math.floor(Math.random() * (brain_size - OUTPUTS + 1)) + OUTPUTS;
-				j = Math.floor(Math.random() * (brain_size - OUTPUTS + 1)) + OUTPUTS;
+				c = Math.floor(Math.random() * (brain_size - OUTPUTS)) + OUTPUTS;
+				j = Math.floor(Math.random() * (brain_size - OUTPUTS)) + OUTPUTS;
+				//document.write(j + " <= " + brain_size + "<br />");
 				if(c != j && !brain[j].noins && !brain[c].static) {
+					brain[c].synaps[brain[c].SYNAPSES] = {};
 					brain[c].synaps[brain[c].SYNAPSES].cell = j;
 					brain[c].synaps[brain[c].SYNAPSES++].weight = 1;
 				}
 			}
 
-			j = 1;
-			for(c = sector; c < brain_size; c++) { // just clear touches
-				if(brain[c].touches == 0) {
-					j = 0;
-					break;
+			if(err > 0) {
+				j = 1;
+				for(c = sector; c < brain_size; c++) { // just clear touches
+					if(brain[c].touches == 0) {
+						j = 0;
+						break;
+					}
 				}
-			}
 
-			if(j) { // if all cells have touches
-				c = brain_size++;
-				init_cell(c);
+				if(j) { // if all cells have touches
+					c = brain_size++;
+					init_cell(c);
+				}
 			}
 		}
 
-		init();
-		run();
-		alert(output);
+		function learn() {
+			var c;
+			var i;
+			var num;
+			var j;
+			var err;
+
+			init();
+
+			for(i = 0; i < 100000; i++) {
+				num = Math.floor(Math.random() * (1000000));
+				j = num;
+				for(c = 0; c < INPUTS; c++) {
+					input[c] = Math.floor(j % Math.pow(10, c + 1));
+					j -= input[c];
+					input[c] /= Math.pow(10, c);
+					input[c] /= 10;
+				}
+
+				run();
+
+				j = num % 2;
+				if(Math.round(output[0]) == j) {
+					//document.write("<b style='color: #0a0'>GOOD</b><br />");
+					err = -1;
+				}else{
+					//document.write("<b style='color: #a00'>BAD</b><br />");
+					err = 1;
+				}
+
+				rebuild(err);
+				//alert(num + " > " + input);
+			}
+
+			document.write("brain_size = " + brain_size + "<br />");
+
+			for(i = 0; i < 10; i++) {
+				num = Math.floor(Math.random() * (1000000));
+				j = num;
+				for(c = 0; c < INPUTS; c++) {
+					input[c] = Math.floor(j % Math.pow(10, c + 1));
+					j -= input[c];
+					input[c] /= Math.pow(10, c);
+					input[c] /= 10;
+				}
+
+				run();
+
+				j = num % 2;
+				if(Math.round(output[0]) == j) {
+					document.write("<b style='color: #0a0'>GOOD</b><br />");
+					err = -1;
+				}else{
+					document.write("<b style='color: #a00'>BAD</b><br />");
+					err = 1;
+				}
+
+				rebuild(err);
+				//alert(num + " > " + input);
+			}
+		}
+
+		window.onload = function () {
+			learn();
+		};
 
 	</script>
 
