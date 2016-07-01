@@ -16,38 +16,44 @@
 
 		var MAX_RATE = 100;
 		var MAX_ITER = 100;
-
-		var RANDOMIZATION = 1; // high values caused unstability
 		// end config
+
+		var sector = INPUTS + OUTPUTS;
 
 		var input = [];
 		var output = [];
 		var brain = [];
 		var brain_size = 0;
 
+		function init_cell(c) {
+			brain[c] = {};
+			brain[c].data = 0;
+			brain[c].static = 0;
+			brain[c].noins = 0;
+			brain[c].touches = 0;
+			brain[c].in = [];
+			brain[c].INS = 0;
+			brain[c].synaps = [];
+			brain[c].SYNAPSES = 0;
+		}
+
 		function init() { // clears your brain and your memory ;)
 			var c;
-			for(c = 0; c < INPUTS; c++) {
-				input[c] = {};
-				input[c].synaps = [];
-				input[c].SYNAPSES = 0;
-				input[c].data = 0;
-			}
 
-			brain_size = OUTPUTS;
+			brain_size = sector;
 			brain = [];
+
+			for(c = 0; c < sector; c++) {
+				init_cell(c);
+			}
 
 			for(c = 0; c < OUTPUTS; c++) {
 				output[c] = 0;
-				brain[c] = {};
-				brain[c].data = 0;
 				brain[c].static = 1;
-				brain[c].in = [];
-				brain[c].INS = 0;
-
-				// only real brain related, not output sector. Just for note
-				brain[c].synaps = [];
-				brain[c].SYNAPSES = 0;
+			}
+			for(c = 0; c < INPUTS; c++) {
+				input[c] = 0;
+				brain[c + OUTPUTS].noins = 1;
 			}
 		}
 
@@ -59,10 +65,7 @@
 			var j;
 
 			for(c = 0; c < INPUTS; c++) {
-				for(i = 0; i < input[c].SYNAPSES; i++) {
-					// brain cell in gets data from input cell
-					brain[input[c].synaps[i]].in[brain[input[c].synaps[i]].INS++] = input[c].data;
-				}
+				brain[c + OUTPUTS].data = input[c];
 			}
 
 			for(j = 0; isig && j < MAX_ITER; j++) {
@@ -101,6 +104,55 @@
 					sum += brain[c].in[i];
 				}
 				output[c] = sum / brain[c].INS;
+			}
+		}
+
+		function rebuild(err) { // rebuild network. err is error ammount
+			var c;
+			var i;
+			var j;
+
+			// first decrement all synapses on err
+			// then make err new synapses
+			// Make cell if all of existing have synapses
+
+			for(c = sector; c < brain_size; c++) { // just clear touches
+				brain[c].touches = 0;
+			}
+
+			for(c = 0; c < brain_size; c++) {
+				for(i = 0; i < brain[c].SYNAPSES; i++) {
+					brain[c].synaps[i].weight -= err;
+					if(brain[c].synaps[i].weight < 1) {
+						// del synaps
+						brain[c].synaps.splice(i, 1);
+						brain[c].SYNAPSES--;
+					}else{
+						brain[brain[c].synaps[i].cell].touches++;
+					}
+				}
+			}
+
+			for(i = 0; i < err; i++) {
+				c = Math.floor(Math.random() * (brain_size - OUTPUTS + 1)) + OUTPUTS;
+				j = Math.floor(Math.random() * (brain_size - OUTPUTS + 1)) + OUTPUTS;
+				if(c != j && !brain[j].noins && !brain[c].static) {
+					brain[c].synaps[brain[c].SYNAPSES].cell = j;
+					brain[c].synaps[brain[c].SYNAPSES++].weight = 1;
+				}
+			}
+
+			j = 1;
+			for(c = sector; c < brain_size; c++) { // just clear touches
+				if(brain[c].touches == 0) {
+					j = 0;
+					break;
+				}
+			}
+
+			if(j) { // if all cells have touches
+				c = brain_size++;
+				init_cell(c);
 			}
 		}
 
