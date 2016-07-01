@@ -1,0 +1,52 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name='viewport' content='width=device-width' />
+	<title>Гравитация - Дима на ОБЛК</title>
+	<style>
+		body { margin: 0; padding: 0; }
+	</style>
+</head>
+<body>
+	<script>
+
+		// config
+		var INPUTS = 32 * 32;
+		var OUTPUTS = 11;
+
+		var MAX_RATE = 100;
+
+		var RANDOMIZATION_SPEED = 1; // high values caused unstability
+		// end config
+
+		var input = [];
+		var output = [];
+		var brain = [];
+		var brain_size = 0;
+
+		function init() { // clears your brain and your memory ;)
+			var c;
+			for(c = 0; c < INPUTS; c++) {
+				input[c] = {};
+				input[c].synaps = [];
+				input[c].SYNAPSES = 0;
+				input[c].data = 0;
+			}
+			for(c = 0; c < OUTPUTS; c++) {
+				output[c] = {};
+			}
+			brain_size = 0;
+			brain = [];
+		}
+
+		function run() { // gets input[] preconfigured and returns (configures) output[]
+
+		}
+
+		alert(input[23]);
+
+	</script>
+
+<!-- Yandex.Metrika counter --> <script type="text/javascript"> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter31678721 = new Ya.Metrika({ id:31678721, clickmap:true, trackLinks:true, accurateTrackBounce:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/31678721" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
+</body>
+</html>
